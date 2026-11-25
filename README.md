@@ -23,6 +23,19 @@ GitHub Pages; conținutul, voturile și panoul de control folosesc Supabase.
 6. Din **Project Settings → API** copiază *Project URL* și cheia *anon / publishable*.
    Cheia `service_role` nu se pune niciodată în acest proiect.
 
+## Admini și parole
+
+- **Setare obligatorie în Supabase** (Authentication → URL Configuration): *Site URL* = `https://vi-mp.ro`;
+  la *Redirect URLs* adaugă `https://vi-mp.ro/**` (și `http://localhost:5173/**` pentru teste locale).
+  Fără ele, linkurile din emailuri duc la `localhost:3000`.
+- **Parolă uitată:** pe `vi-mp.ro/admin/` → „Ai uitat parola?” → linkul din email deschide panoul și
+  cere o parolă nouă. Linkurile expiră (implicit într-o oră) și merg o singură dată.
+- **Schimbă parola:** din panou, butonul „Schimbă parola”.
+- **Admin nou:** Authentication → Users → *Invite user* (primește un email și își alege singur parola),
+  apoi în SQL Editor: `insert into public.admins (user_id) select id from auth.users where email = '…';`
+- Emailurile trimise de serverul implicit Supabase sunt limitate (câteva pe oră); pentru mai multe,
+  configurează un SMTP propriu în Supabase.
+
 ## Dezvoltare locală
 
 ```sh

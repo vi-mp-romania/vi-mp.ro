@@ -3,14 +3,17 @@
 import { useEffect, useState } from 'react';
 
 // Logic
-import { BASE_PATH, legacyHashPath, parsePath, type Route } from '@/lib/routes';
+import { parseAuthLink } from '@/lib/authLink';
+import { BASE_PATH, legacyHashPath, parsePath, routePath, type Route } from '@/lib/routes';
 
 /**
  * Returns the route for the current URL and keeps it in step with navigation. A plain left-click on
  * a link to another page of this site is handled here (history.pushState, no reload) and the new
  * page starts at the top; links with a target, a download attribute or a modifier key, other
  * origins, and in-page anchors ("#status" on the same page, scrolled by useSmoothScroll) are left
- * alone. Links from the old hash-routed site ("#/noutati") are rewritten to their path once.
+ * alone. Links from the old hash-routed site ("#/noutati") are rewritten to their path once, and a
+ * Supabase email link (password reset, invitation) that landed on another page moves to the control
+ * panel with its hash, where it is handled.
  * `initialRoute` is for the build-time prerender, where there is no window (and where the 404
  * page has no path of its own to parse).
  */
@@ -22,9 +25,13 @@ export function useRoute(initialRoute?: Route): Route {
   // Lifecycle: legacy hash links, link clicks, back/forward.
   useEffect(() => {
     const legacy = legacyHashPath(window.location.hash);
+    const admin = routePath({ page: 'admin' });
     if (legacy) {
       window.history.replaceState(null, '', legacy);
       setRoute(parsePath(legacy));
+    } else if (parseAuthLink(window.location.hash) && window.location.pathname !== admin) {
+      window.history.replaceState(null, '', admin + window.location.hash);
+      setRoute({ page: 'admin' });
     }
 
     /** Navigates in-app for a plain click on a link to another page of this site. */

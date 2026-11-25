@@ -31,6 +31,18 @@ export function toApiError(failure: unknown): ApiError {
   if (code === 'invalid_credentials' || message === 'Invalid login credentials') {
     return new ApiError('Email sau parolă greșită.', { cause: failure });
   }
+  if (code === 'same_password') {
+    return new ApiError('Parola nouă trebuie să fie diferită de cea veche.', { cause: failure });
+  }
+  if (code === 'weak_password') {
+    return new ApiError('Parola e prea slabă. Folosește una mai lungă, cu litere și cifre.', { cause: failure });
+  }
+  if (code === 'over_email_send_rate_limit' || status === 429) {
+    return new ApiError('Prea multe încercări. Așteaptă puțin (până la o oră) și încearcă din nou.', { cause: failure });
+  }
+  if (code === 'session_not_found' || code === 'refresh_token_not_found' || code === 'bad_jwt') {
+    return new ApiError('Sesiunea din link nu mai este validă. Cere un link nou.', { cause: failure });
+  }
   if (code === '42501' || status === 401 || status === 403) {
     return new ApiError('Nu ai drepturi pentru această acțiune.', { cause: failure });
   }

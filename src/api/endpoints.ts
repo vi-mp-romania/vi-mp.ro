@@ -128,6 +128,27 @@ export function createApi(client: SupabaseClient | null) {
       if (error) throw toApiError(error);
     },
 
+    /** Signs in with the session an emailed reset or invitation link carried. */
+    async setSessionFromLink(accessToken: string, refreshToken: string): Promise<void> {
+      const { error } = await db().auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+      if (error) throw toApiError(error);
+    },
+
+    /** Sets a new password for the signed-in user. */
+    async updatePassword(password: string): Promise<void> {
+      const { error } = await db().auth.updateUser({ password });
+      if (error) throw toApiError(error);
+    },
+
+    /**
+     * Emails a password reset link that returns to `redirectTo` (which must be listed under the
+     * project's Redirect URLs). Succeeds for unknown addresses too, so it reveals nothing.
+     */
+    async requestPasswordReset(email: string, redirectTo: string): Promise<void> {
+      const { error } = await db().auth.resetPasswordForEmail(email, { redirectTo });
+      if (error) throw toApiError(error);
+    },
+
     /** True when the signed-in user is listed in public.admins. */
     async isAdmin(): Promise<boolean> {
       return parse(z.boolean(), await run(db().rpc('is_admin')));
