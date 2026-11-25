@@ -140,7 +140,7 @@ export const TEXT_REGISTRY = {
   'footer.disclaimer': {
     section: 'footer',
     label: 'Mențiune',
-    value: 'Not affiliated with or endorsed by Rockstar Games.',
+    value: 'Not affiliated with or endorsed by Rockstar Games or Take-Two Interactive.',
   },
   'footer.discordLink': { section: 'footer', label: 'Link Discord', value: 'Discord' },
 
@@ -152,7 +152,7 @@ export const TEXT_REGISTRY = {
   },
   'consent.accept': { section: 'consent', label: 'Buton acceptă', value: 'Accept' },
   'consent.refuse': { section: 'consent', label: 'Buton refuză', value: 'Decline' },
-  'consent.footerLink': { section: 'consent', label: 'Link în subsol', value: 'Cookies' },
+  'consent.footerLink': { section: 'consent', label: 'Link în subsol', value: 'Cookie Preferences' },
 } as const satisfies Record<string, TextEntry>;
 
 /** Key of an editable text. */
