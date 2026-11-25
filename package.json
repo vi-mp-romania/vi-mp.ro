@@ -1,0 +1,38 @@
+{
+  "name": "vi-mp-ro",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "node --import tsx --test \"src/**/*.test.ts\"",
+    "build": "tsc --noEmit -p tsconfig.json && vite build && vite build --ssr src/prerender.tsx --outDir .prerender --emptyOutDir && tsx scripts/prerender.ts",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@fontsource-variable/outfit": "^5.3.0",
+    "@fontsource/jetbrains-mono": "^5.3.0",
+    "@supabase/supabase-js": "^2.119.2",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.80.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "tailwind-merge": "^3.7.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.5",
+    "@types/node": "^26.6.10",
+    "@types/react": "^19.3.2",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.3.0",
+    "tailwindcss": "^4.3.5",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.8"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true
+  }
+}

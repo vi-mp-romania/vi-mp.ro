@@ -1,0 +1,37 @@
+/* The single stylesheet entry: Tailwind and the theme tokens. */
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Outfit Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --color-background: #0d0b1a;
+  --color-foreground: #eeeaf7;
+  --color-muted-foreground: #a9a3bf;
+  --color-card: #161328;
+  --color-card-strong: #1d1933;
+  --color-border: #2e2947;
+  --color-primary: #ff86b8;
+  --color-primary-strong: #ff6aa6;
+  --color-primary-foreground: #1a0f1c;
+  --color-accent: #f7a24f;
+  --color-success: #7fe7b4;
+  --color-success-foreground: #0d2a1e;
+  --color-danger: #ff6b6b;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    color-scheme: dark;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary;
+  }
+  section[id] {
+    scroll-margin-top: 5rem;
+  }
+}
