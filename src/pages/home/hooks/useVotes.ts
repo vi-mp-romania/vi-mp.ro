@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react';
 
 // Logic
 import { useApi } from '@/api/ApiContext';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import { getVoterId, readOwnAnswers, writeOwnAnswer } from '@/lib/voterId';
 
 // Types
@@ -26,6 +27,7 @@ export interface Votes {
  */
 export function useVotes(): Votes {
   const api = useApi();
+  const analytics = useAnalytics();
 
   // State
   const [answers, setAnswers] = useState(readOwnAnswers);
@@ -42,6 +44,7 @@ export function useVotes(): Votes {
         .then(() => {
           writeOwnAnswer(poll, answer);
           setOutcomes((current) => ({ ...current, [poll]: 'saved' }));
+          analytics.track({ name: 'poll_vote', params: { poll, answer } }); // counted only once saved
         })
         .catch(() => {
           // Restore what was saved before; the error itself was logged by the api layer.
@@ -49,7 +52,7 @@ export function useVotes(): Votes {
           setOutcomes((current) => ({ ...current, [poll]: 'failed' }));
         });
     },
-    [api],
+    [api, analytics],
   );
 
   return { answers, outcomes, vote };

@@ -66,6 +66,15 @@ localStorage (`api/siteDataCache.ts`, validated with the row schemas) so a retur
 paint is the real content; fresh data then replaces it. New data-driven blocks follow the same rule.
 Check with a hard reload and the layout-shift measurement (CLS) rather than by eye.
 
+**Analytics.** Google Analytics 4 is optional and consent-gated. The measurement id is a setting
+(`site_settings.ga_measurement_id`, migration 0003, edited in Setări); empty means off and no banner.
+`lib/analytics.ts` is one resource created in `main.tsx` and provided through `useAnalytics()`; it
+loads nothing from Google until `enable`, which `useAnalyticsConsent` calls only after the visitor
+pressed Accept (stored in localStorage; the footer link asks again; refusing later deletes GA's
+cookies and reloads). Page views are sent by hand per route (`#/admin` never). Events are a closed
+union (`AnalyticsEvent`): add a case there rather than calling gtag directly. Never send voter ids
+or anything typed by a visitor.
+
 **Scrolling and pointer.** Lenis smooths page scrolling (`hooks/useSmoothScroll.ts`, one instance owned by
 `App`); it turns itself off for reduced motion and handles clicks on in-page section links. Hash routes
 (`#/…`) are left to the browser. The themed cursor and scrollbar live in `style.css`; the cursor applies

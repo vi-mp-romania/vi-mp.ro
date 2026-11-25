@@ -14,6 +14,7 @@ import { VoteResultsDialog } from './dialogs/VoteResultsDialog';
 // Hooks
 import { useVotes } from './hooks/useVotes';
 import { useNews } from '@/hooks/useNews';
+import { useAnalytics } from '@/hooks/useAnalytics';
 
 // Types
 import type { SiteData } from '@/hooks/useSiteData';
@@ -30,6 +31,7 @@ interface Props {
 export function HomePage({ site }: Props) {
   // State
   const votes = useVotes();
+  const analytics = useAnalytics();
   const news = useNews(HOME_NEWS_LIMIT);
   const [isResultsOpen, setIsResultsOpen] = useState(false);
   const hasScrolledToAnchor = useRef(false); // the initial anchor jump happens once per visit
@@ -55,7 +57,10 @@ export function HomePage({ site }: Props) {
         error={site.error}
       />
       <NewsSection news={news} placeholderCount={HOME_NEWS_LIMIT} />
-      <PollSection votes={votes} onShowResults={() => setIsResultsOpen(true)} />
+      <PollSection votes={votes} onShowResults={() => {
+          setIsResultsOpen(true);
+          analytics.track({ name: 'poll_results_open' });
+        }} />
       <ForumSection votes={votes} />
       <DiscordSection discordUrl={discordUrl} isPending={site.isPending} />
       <VoteResultsDialog isOpen={isResultsOpen} onClose={() => setIsResultsOpen(false)} />

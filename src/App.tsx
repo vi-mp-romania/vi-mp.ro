@@ -5,6 +5,7 @@ import { lazy, Suspense, useEffect } from 'react';
 // Components
 import { Header } from './components/layout/Header';
 import { Footer } from './components/layout/Footer';
+import { ConsentBanner } from './components/layout/ConsentBanner';
 import { NewsPage } from './pages/news/NewsPage';
 import { HomePage } from './pages/home/HomePage';
 
@@ -13,6 +14,7 @@ import { useRoute } from './hooks/useRoute';
 import { TextsContext } from './hooks/useTexts';
 import { useSiteData } from './hooks/useSiteData';
 import { useSmoothScroll } from './hooks/useSmoothScroll';
+import { useAnalyticsConsent } from './hooks/useAnalyticsConsent';
 
 // Constants
 /** The control panel is loaded only when someone opens #/admin. */
@@ -23,6 +25,7 @@ export function App() {
   const route = useRoute();
   const site = useSiteData();
   useSmoothScroll();
+  const consent = useAnalyticsConsent(site.settings?.ga_measurement_id, route);
   const discordUrl = site.settings?.discord_url;
 
   // Lifecycle: a new page starts at the top (in-page anchors keep their own scrolling).
@@ -43,7 +46,10 @@ export function App() {
             </Suspense>
           )}
         </main>
-        <Footer discordUrl={discordUrl} />
+        <Footer discordUrl={discordUrl} onOpenConsent={consent.isAvailable ? consent.reopen : undefined} />
+        {consent.isBannerVisible && route !== 'admin' && (
+          <ConsentBanner onAccept={consent.accept} onRefuse={consent.refuse} />
+        )}
       </div>
     </TextsContext.Provider>
   );

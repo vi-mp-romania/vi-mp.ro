@@ -6,15 +6,18 @@ import { ArrowUpRight } from 'lucide-react';
 import { safeUrl } from '@/lib/safeUrl';
 import { useTexts } from '@/hooks/useTexts';
 import { ROUTE_HASHES } from '@/lib/routes';
+import { useAnalytics } from '@/hooks/useAnalytics';
 
 /** Props of Footer. */
 interface Props {
   discordUrl: string | undefined;
+  onOpenConsent?: () => void; // shows the cookie banner again; the link hides without analytics
 }
 
-/** The site footer; the admin link is deliberately quiet. */
-export function Footer({ discordUrl }: Props) {
+/** The site footer; the admin and cookie links are deliberately quiet. */
+export function Footer({ discordUrl, onOpenConsent }: Props) {
   const texts = useTexts();
+  const analytics = useAnalytics();
   const discordHref = safeUrl(discordUrl);
 
   return (
@@ -25,6 +28,11 @@ export function Footer({ discordUrl }: Props) {
         </a>
         <p className="text-center text-xs text-muted-foreground">{texts['footer.disclaimer']}</p>
         <div className="flex items-center gap-4">
+          {onOpenConsent && (
+            <button type="button" onClick={onOpenConsent} className="text-xs text-muted-foreground/60 hover:text-muted-foreground">
+              {texts['consent.footerLink']}
+            </button>
+          )}
           <a href={ROUTE_HASHES.admin} className="text-xs text-muted-foreground/60 hover:text-muted-foreground">
             Admin
           </a>
@@ -33,6 +41,7 @@ export function Footer({ discordUrl }: Props) {
               href={discordHref}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => analytics.track({ name: 'discord_click', params: { placement: 'footer' } })}
               className="inline-flex items-center gap-1 font-semibold hover:text-primary"
             >
               {texts['footer.discordLink']}

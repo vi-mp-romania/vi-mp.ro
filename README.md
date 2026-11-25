@@ -54,6 +54,18 @@ Fără `.env` site-ul pornește cu textele implicite și arată că nu e conecta
   `chromium --headless --hide-scrollbars --window-size=1200,630 --screenshot=public/og-image.png http://localhost:5173/`
 - Textele schimbate din panou nu ajung în titlul/descrierea din `index.html`; acelea se schimbă în cod.
 
+## Google Analytics
+
+1. Rulează `supabase/migrations/0003_analytics.sql` în SQL Editor (adaugă setarea).
+2. În Google Analytics creează o proprietate GA4 cu un *Web data stream* pentru `https://vi-mp.ro`
+   și copiază *Measurement ID* (`G-XXXXXXXXXX`).
+3. Panou → **Setări → Google Analytics**: lipește ID-ul și salvează.
+
+Vizitatorii văd un banner „Accept / Refuz”; Google Analytics se încarcă doar după „Accept”. Linkul
+„Cookie-uri” din subsol îi lasă să se răzgândească. Se trimit vizualizări de pagină (`/` și
+`/noutati`, niciodată panoul) și evenimentele `discord_click`, `poll_vote`, `poll_results_open`,
+`news_video_play`, `news_link_click`. ID gol = fără analytics și fără banner.
+
 ## Ce se schimbă din panou
 
 | Tab | Ce editează |

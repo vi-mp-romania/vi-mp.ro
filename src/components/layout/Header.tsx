@@ -64,7 +64,7 @@ export function Header({ route, discordUrl, isPending }: Props) {
           ))}
         </nav>
 
-        <DiscordButton url={discordUrl} label={texts['header.discordButton']} size="sm" isPending={isPending} />
+        <DiscordButton url={discordUrl} label={texts['header.discordButton']} placement="header" size="sm" isPending={isPending} />
       </div>
     </header>
   );

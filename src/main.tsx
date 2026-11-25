@@ -14,15 +14,20 @@ import { App } from './App';
 import { ApiProvider } from './api/ApiContext';
 import { createApi } from './api/endpoints';
 import { readSettings } from './lib/settings';
+import { createAnalytics } from './lib/analytics';
+import { AnalyticsContext } from './hooks/useAnalytics';
 import { createSupabaseClient } from './api/supabaseClient';
 
 const settings = readSettings(import.meta.env);
 const api = createApi(createSupabaseClient(settings));
+const analytics = createAnalytics(); // disabled until the visitor accepts analytics cookies
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ApiProvider api={api}>
-      <App />
+      <AnalyticsContext.Provider value={analytics}>
+        <App />
+      </AnalyticsContext.Provider>
     </ApiProvider>
   </StrictMode>,
 );

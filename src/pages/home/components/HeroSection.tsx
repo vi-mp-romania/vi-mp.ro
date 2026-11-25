@@ -38,7 +38,7 @@ export function HeroSection({ discordUrl, heroImageUrl, isPending }: Props) {
         </h1>
         <p className="max-w-md text-base text-foreground/85 sm:text-lg">{texts['hero.description']}</p>
         <div className="flex flex-wrap items-center gap-6 pt-2">
-          <DiscordButton url={discordUrl} label={texts['hero.discordButton']} size="lg" isPending={isPending} />
+          <DiscordButton url={discordUrl} label={texts['hero.discordButton']} placement="hero" size="lg" isPending={isPending} />
           <a href="#noutati" className="inline-flex items-center gap-1.5 font-semibold hover:text-primary">
             {texts['hero.newsLink']}
             <ArrowDown className="size-4" aria-hidden="true" />

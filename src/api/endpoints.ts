@@ -47,7 +47,9 @@ export function createApi(client: SupabaseClient | null) {
 
     /** The site settings row. */
     async getSettings(): Promise<SiteSettings> {
-      const rows = await run(db().from('site_settings').select('discord_url, hero_image_url, current_stage').eq('id', 1));
+      // Every column: the row is public and small, and a column added by a later migration
+      // (ga_measurement_id) must not break the site before that migration has been applied.
+      const rows = await run(db().from('site_settings').select('*').eq('id', 1));
       const row = parse(z.array(siteSettingsSchema), rows)[0];
       if (!row) throw new ApiError('Setările site-ului lipsesc din baza de date.');
       return row;
@@ -122,9 +124,9 @@ export function createApi(client: SupabaseClient | null) {
 
     // ---- Admin writes ----------------------------------------------------------------------
 
-    /** Saves the Discord and hero image URLs. */
-    async saveLinks(links: Pick<SiteSettings, 'discord_url' | 'hero_image_url'>): Promise<void> {
-      await run(db().from('site_settings').update({ ...links, updated_at: new Date().toISOString() }).eq('id', 1));
+    /** Saves the Discord and hero image URLs and the Google Analytics measurement id. */
+    async saveSiteSettings(values: Pick<SiteSettings, 'discord_url' | 'hero_image_url' | 'ga_measurement_id'>): Promise<void> {
+      await run(db().from('site_settings').update({ ...values, updated_at: new Date().toISOString() }).eq('id', 1));
     },
 
     /** Replaces the timeline and the current stage atomically (save_status RPC). */

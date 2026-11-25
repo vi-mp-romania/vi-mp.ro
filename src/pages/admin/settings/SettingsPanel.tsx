@@ -11,6 +11,7 @@ import { ActionMessage } from '../components/ActionMessage';
 
 // Logic
 import { safeUrl } from '@/lib/safeUrl';
+import { isMeasurementId } from '@/lib/analytics';
 import { useApi } from '@/api/ApiContext';
 import { useAction } from '../hooks/useAction';
 
@@ -22,7 +23,10 @@ interface Props {
   site: SiteData;
 }
 
-/** Both URLs may be empty: an empty Discord URL hides every Discord button. */
+/**
+ * Every value may be empty: an empty Discord URL hides every Discord button, an empty measurement id
+ * turns Google Analytics (and its consent banner) off.
+ */
 export function SettingsPanel({ site }: Props) {
   const api = useApi();
   const action = useAction();
@@ -30,22 +34,31 @@ export function SettingsPanel({ site }: Props) {
   // State
   const [discordUrl, setDiscordUrl] = useState('');
   const [heroImageUrl, setHeroImageUrl] = useState('');
+  const [measurementId, setMeasurementId] = useState('');
 
   // Lifecycle: start from the saved values.
   useEffect(() => {
     setDiscordUrl(site.settings?.discord_url ?? '');
     setHeroImageUrl(site.settings?.hero_image_url ?? '');
+    setMeasurementId(site.settings?.ga_measurement_id ?? '');
   }, [site.settings]);
 
   // Actions
   const save = async () => {
-    const links = { discord_url: discordUrl.trim(), hero_image_url: heroImageUrl.trim() };
-    const isValid = Object.values(links).every((value) => value === '' || safeUrl(value));
-    if (!isValid) {
+    const values = {
+      discord_url: discordUrl.trim(),
+      hero_image_url: heroImageUrl.trim(),
+      ga_measurement_id: measurementId.trim().toUpperCase(),
+    };
+    if (![values.discord_url, values.hero_image_url].every((value) => value === '' || safeUrl(value))) {
       action.fail('Linkurile trebuie să înceapă cu https://');
       return;
     }
-    if (await action.run(() => api.saveLinks(links), 'Setările au fost salvate.')) site.reload();
+    if (values.ga_measurement_id !== '' && !isMeasurementId(values.ga_measurement_id)) {
+      action.fail('ID-ul Google Analytics arată ca G-XXXXXXXXXX.');
+      return;
+    }
+    if (await action.run(() => api.saveSiteSettings(values), 'Setările au fost salvate.')) site.reload();
   };
 
   return (
@@ -55,6 +68,12 @@ export function SettingsPanel({ site }: Props) {
       </Field>
       <Field label="Imagine hero (URL)" hint="Gol = ilustrația implicită cu orașul la apus.">
         <Input type="url" value={heroImageUrl} onChange={(e) => setHeroImageUrl(e.target.value)} placeholder="https://…" />
+      </Field>
+      <Field
+        label="Google Analytics (Measurement ID)"
+        hint="Din GA: Admin → Data streams → stream-ul site-ului. Gol = fără analytics și fără banner de cookie-uri."
+      >
+        <Input value={measurementId} onChange={(e) => setMeasurementId(e.target.value)} placeholder="G-XXXXXXXXXX" />
       </Field>
       <div className="flex items-center gap-4">
         <Button onClick={() => void save()} disabled={action.isBusy}>

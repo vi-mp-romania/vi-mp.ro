@@ -5,7 +5,7 @@
  */
 
 /** A group of texts, shown together in the control panel. */
-export type TextSection = 'header' | 'hero' | 'status' | 'news' | 'polls' | 'forum' | 'discord' | 'footer';
+export type TextSection = 'header' | 'hero' | 'status' | 'news' | 'polls' | 'forum' | 'discord' | 'footer' | 'consent';
 
 /** One editable text. */
 export interface TextEntry {
@@ -28,6 +28,7 @@ export const TEXT_SECTIONS: Readonly<Record<TextSection, string>> = {
   forum: 'Forum',
   discord: 'Discord',
   footer: 'Subsol',
+  consent: 'Cookie-uri (Google Analytics)',
 };
 
 /** Every text on the site, by key. Keys are camelCase with dots; the DB checks the same shape. */
@@ -142,6 +143,18 @@ export const TEXT_REGISTRY = {
     value: 'Comunitate independentă, neafiliată Rockstar Games.',
   },
   'footer.discordLink': { section: 'footer', label: 'Link Discord', value: 'Discord' },
+
+  'consent.message': {
+    section: 'consent',
+    label: 'Mesaj banner',
+    value:
+      'Folosim Google Analytics, cu cookie-uri, ca să vedem câți vizitatori avem și ce îi interesează. ' +
+      'Se pornește doar dacă ești de acord.',
+    isLong: true,
+  },
+  'consent.accept': { section: 'consent', label: 'Buton acceptă', value: 'Accept' },
+  'consent.refuse': { section: 'consent', label: 'Buton refuză', value: 'Refuz' },
+  'consent.footerLink': { section: 'consent', label: 'Link în subsol', value: 'Cookie-uri' },
 } as const satisfies Record<string, TextEntry>;
 
 /** Key of an editable text. */

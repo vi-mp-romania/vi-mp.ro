@@ -9,6 +9,7 @@ import { SkylineIllustration } from './SkylineIllustration';
 
 // Logic
 import { safeUrl } from '@/lib/safeUrl';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import { youtubeEmbedUrl, youtubeVideoId } from '@/lib/youtube';
 
 // Types
@@ -38,9 +39,19 @@ export function NewsCard({ item }: Props) {
   const href = safeUrl(item.url);
   const imageSrc = safeUrl(item.image_url);
   const videoId = youtubeVideoId(href);
+  const analytics = useAnalytics();
 
   // State
   const [isPlaying, setIsPlaying] = useState(false);
+
+  // Actions
+  const play = () => {
+    setIsPlaying(true);
+    analytics.track({ name: 'news_video_play', params: { news_title: item.title } });
+  };
+  const trackLinkClick = () => {
+    if (href) analytics.track({ name: 'news_link_click', params: { news_title: item.title, link_url: href } });
+  };
 
   const picture = (
     <>
@@ -74,14 +85,22 @@ export function NewsCard({ item }: Props) {
       )}
       {videoId && !isPlaying && (
         <MediaFrame>
-          <button type="button" onClick={() => setIsPlaying(true)} aria-label={`Redă video: ${item.title}`} className="group block h-full w-full">
+          <button type="button" onClick={play} aria-label={`Redă video: ${item.title}`} className="group block h-full w-full">
             {picture}
           </button>
         </MediaFrame>
       )}
       {!videoId && href && (
         <MediaFrame>
-          <a href={href} target="_blank" rel="noopener noreferrer" tabIndex={-1} aria-hidden="true" className="group block h-full w-full">
+          <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            tabIndex={-1}
+            aria-hidden="true"
+            onClick={trackLinkClick}
+            className="group block h-full w-full"
+          >
             {picture}
           </a>
         </MediaFrame>
@@ -100,6 +119,7 @@ export function NewsCard({ item }: Props) {
           href={href}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={trackLinkClick}
           className="inline-flex w-fit items-center gap-1.5 font-semibold text-primary hover:underline"
         >
           {item.cta_label || 'Deschide'}

@@ -12,6 +12,8 @@ export const siteSettingsSchema = z.object({
   discord_url: z.string(),
   hero_image_url: z.string(),
   current_stage: z.number().int(),
+  // Added by migration 0003; defaults to "off" for a database (or a cached snapshot) without it.
+  ga_measurement_id: z.string().default(''),
 });
 
 /** Site-wide settings edited in the control panel. */
