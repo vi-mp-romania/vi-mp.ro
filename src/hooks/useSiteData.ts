@@ -4,9 +4,9 @@ import { useCallback, useEffect, useState } from 'react';
 
 // Logic
 import { useApi } from '@/api/ApiContext';
+import { useBootstrap } from './useBootstrap';
 import { errorMessage } from '@/lib/errorMessage';
 import { DEFAULT_TEXTS, resolveTexts, type Texts } from '@/lib/texts';
-import { readCachedSite, writeCachedSite } from '@/api/siteDataCache';
 
 // Types
 import type { SiteSettings } from '@/api/types';
@@ -15,10 +15,10 @@ import type { StatusStage } from '@/lib/statusProgress';
 /** App-wide data and its loading state. */
 export interface SiteData {
   texts: Texts;
-  /** Null until the first load (or the cache) provides it, and when the database cannot be read. */
+  /** Null until known (bootstrap data or the first load), and when the database cannot be read. */
   settings: SiteSettings | null;
   stages: StatusStage[];
-  /** True while a request is in flight; data may already be present from the cache. */
+  /** True while a request is in flight; data may already be present from the bootstrap. */
   isLoading: boolean;
   /** True while nothing is known yet: show placeholders that hold the layout. */
   isPending: boolean;
@@ -29,18 +29,18 @@ export interface SiteData {
 }
 
 /**
- * Starts from the cached data of the last visit (if any), then fetches settings, stages and texts
- * in parallel and replaces it. Texts fall back to the registry defaults when there is neither, so
- * the page always has words to show.
+ * Starts from the page's bootstrap data (if any), then fetches settings, stages and texts in
+ * parallel and replaces it. Texts fall back to the registry defaults when there is neither, so the
+ * page always has words to show.
  */
 export function useSiteData(): SiteData {
   const api = useApi();
+  const bootstrap = useBootstrap();
 
-  // State: the cache is read once, for the first render.
-  const [cached] = useState(readCachedSite);
-  const [texts, setTexts] = useState<Texts>(() => (cached ? resolveTexts(cached.overrides) : DEFAULT_TEXTS));
-  const [settings, setSettings] = useState<SiteSettings | null>(cached?.settings ?? null);
-  const [stages, setStages] = useState<StatusStage[]>(cached?.stages ?? []);
+  // State
+  const [texts, setTexts] = useState<Texts>(() => (bootstrap ? resolveTexts(bootstrap.overrides) : DEFAULT_TEXTS));
+  const [settings, setSettings] = useState<SiteSettings | null>(bootstrap?.settings ?? null);
+  const [stages, setStages] = useState<StatusStage[]>(bootstrap?.stages ?? []);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [generation, setGeneration] = useState(0); // bumping it triggers a reload
@@ -56,8 +56,6 @@ export function useSiteData(): SiteData {
         setStages(loadedStages);
         setTexts(resolveTexts(overrides));
         setError(null);
-        // Remember it for the next visit's first paint.
-        writeCachedSite({ settings: loadedSettings, stages: loadedStages, overrides });
       })
       .catch((failure: unknown) => {
         if (isCurrent) setError(errorMessage(failure));

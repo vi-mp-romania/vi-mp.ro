@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react';
 
 // Logic
 import { useApi } from '@/api/ApiContext';
+import { useBootstrap } from './useBootstrap';
 import { errorMessage } from '@/lib/errorMessage';
-import { readCachedNews, writeCachedNews } from '@/api/siteDataCache';
 
 // Types
 import type { NewsItem } from '@/api/types';
@@ -19,14 +19,15 @@ export interface NewsList {
 }
 
 /**
- * Shows the news cached from the last visit at once, then fetches published news and replaces it.
- * `limit` caps the count (home page); undefined lists all.
+ * Shows the bootstrap news at once, then fetches published news and replaces it. `limit` caps the
+ * count (home page); undefined lists all.
  */
 export function useNews(limit?: number): NewsList {
   const api = useApi();
+  const bootstrap = useBootstrap();
 
   // State
-  const [items, setItems] = useState<NewsItem[] | null>(() => readCachedNews(limit));
+  const [items, setItems] = useState<NewsItem[] | null>(() => bootstrap?.news.slice(0, limit) ?? null);
   const [error, setError] = useState<string | null>(null);
 
   // Lifecycle
@@ -34,11 +35,7 @@ export function useNews(limit?: number): NewsList {
     let isCurrent = true; // ignore a late answer after unmount
     api
       .listNews({ publishedOnly: true, limit })
-      .then((loaded) => {
-        if (!isCurrent) return;
-        setItems(loaded);
-        writeCachedNews(limit, loaded);
-      })
+      .then((loaded) => isCurrent && setItems(loaded))
       .catch((failure: unknown) => isCurrent && setError(errorMessage(failure)));
     return () => {
       isCurrent = false;

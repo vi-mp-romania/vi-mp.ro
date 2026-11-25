@@ -8,11 +8,13 @@ import { NewsSection } from './components/NewsSection';
 import { PollSection } from './components/PollSection';
 import { ForumSection } from './components/ForumSection';
 import { StatusSection } from './components/StatusSection';
+import { FaqSection } from './components/FaqSection';
 import { DiscordSection } from './components/DiscordSection';
 import { VoteResultsDialog } from './dialogs/VoteResultsDialog';
 
 // Hooks
 import { useVotes } from './hooks/useVotes';
+import { useFaq } from '@/hooks/useFaq';
 import { useNews } from '@/hooks/useNews';
 import { useAnalytics } from '@/hooks/useAnalytics';
 
@@ -20,7 +22,7 @@ import { useAnalytics } from '@/hooks/useAnalytics';
 import type { SiteData } from '@/hooks/useSiteData';
 
 // Constants
-const HOME_NEWS_LIMIT = 2; // the full list is on #/noutati
+const HOME_NEWS_LIMIT = 2; // the full list is on /noutati/
 
 /** Props of HomePage. */
 interface Props {
@@ -33,6 +35,7 @@ export function HomePage({ site }: Props) {
   const votes = useVotes();
   const analytics = useAnalytics();
   const news = useNews(HOME_NEWS_LIMIT);
+  const faq = useFaq();
   const [isResultsOpen, setIsResultsOpen] = useState(false);
   const hasScrolledToAnchor = useRef(false); // the initial anchor jump happens once per visit
 
@@ -62,6 +65,7 @@ export function HomePage({ site }: Props) {
           analytics.track({ name: 'poll_results_open' });
         }} />
       <ForumSection votes={votes} />
+      <FaqSection items={faq} />
       <DiscordSection discordUrl={discordUrl} isPending={site.isPending} />
       <VoteResultsDialog isOpen={isResultsOpen} onClose={() => setIsResultsOpen(false)} />
     </>

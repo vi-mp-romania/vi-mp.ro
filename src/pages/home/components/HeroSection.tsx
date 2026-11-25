@@ -35,12 +35,13 @@ export function HeroSection({ discordUrl, heroImageUrl, isPending }: Props) {
       </div>
 
       <div className="relative mx-auto flex max-w-6xl flex-col gap-5 px-4 py-16 sm:px-6 md:py-24">
-        <Eyebrow>{texts['hero.eyebrow']}</Eyebrow>
-        <h1 className="text-5xl font-extrabold leading-[0.95] tracking-tight sm:text-6xl md:text-7xl">
+        {/* The small line is the H1 (the search terms); the big slogan is display text. */}
+        <Eyebrow as="h1">{texts['hero.eyebrow']}</Eyebrow>
+        <p className="text-5xl font-extrabold leading-[0.95] tracking-tight sm:text-6xl md:text-7xl">
           {texts['hero.titleLine1']}
           <br />
           <span className="text-primary">{texts['hero.titleLine2']}</span>
-        </h1>
+        </p>
         <p className="max-w-md text-base text-foreground/85 sm:text-lg">{texts['hero.description']}</p>
         <div className="flex flex-wrap items-center gap-6 pt-2">
           <DiscordButton url={discordUrl} label={texts['hero.discordButton']} placement="hero" size="lg" isPending={isPending} />

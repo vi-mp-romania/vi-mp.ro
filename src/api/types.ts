@@ -42,6 +42,9 @@ export const newsItemSchema = z.object({
   is_published: z.boolean(),
   position: z.number().int(),
   created_at: z.string(),
+  // Added by migration 0005; defaults keep a database without them readable.
+  slug: z.string().default(''),
+  body: z.string().default(''),
 });
 
 /** A news item. */
@@ -49,6 +52,21 @@ export type NewsItem = z.infer<typeof newsItemSchema>;
 
 /** The editable fields of a news item (id and created_at are set by the database). */
 export type NewsItemDraft = Omit<NewsItem, 'id' | 'created_at'>;
+
+/** A public.faq_items row (migration 0005). */
+export const faqItemSchema = z.object({
+  id: z.string(),
+  question: z.string(),
+  answer: z.string(),
+  is_published: z.boolean(),
+  position: z.number().int(),
+});
+
+/** A FAQ entry. */
+export type FaqItem = z.infer<typeof faqItemSchema>;
+
+/** The editable fields of a FAQ entry. */
+export type FaqItemDraft = Omit<FaqItem, 'id'>;
 
 /** A vote_results() row; bigint counts arrive as numbers or strings depending on size. */
 export const voteCountSchema = z.object({
@@ -60,4 +78,14 @@ export const voteCountSchema = z.object({
 /** The editable fields of a stored news item. */
 export function toNewsDraft({ id: _id, created_at: _createdAt, ...draft }: NewsItem): NewsItemDraft {
   return draft;
+}
+
+/** The editable fields of a stored FAQ entry. */
+export function toFaqDraft({ id: _id, ...draft }: FaqItem): FaqItemDraft {
+  return draft;
+}
+
+/** The URL slug of a news item; items saved before slugs existed use their id. */
+export function newsSlug(item: Pick<NewsItem, 'id' | 'slug'>): string {
+  return item.slug || item.id;
 }

@@ -6,9 +6,9 @@ import { useEffect } from 'react';
 /**
  * Owns one Lenis instance for the app's lifetime (created on mount, destroyed on unmount). Lenis
  * turns itself off for visitors who ask for reduced motion. Its built-in anchor handling is not
- * used, because it would treat hash routes such as "#/noutati" as element selectors; instead a click
- * on a link to a section on this page ("#status") is scrolled here, and every other link is left to
- * the browser. Scrolling inside an open <dialog> stays native.
+ * used: it also catches links to other pages ("/#status" from an article). Instead a click on a link
+ * to a section that exists on the current page is scrolled here, and every other link is left to
+ * useRoute and the browser. Scrolling inside an open <dialog> stays native.
  */
 export function useSmoothScroll(): void {
   // Lifecycle

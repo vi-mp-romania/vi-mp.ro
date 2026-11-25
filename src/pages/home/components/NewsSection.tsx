@@ -8,7 +8,7 @@ import { NewsCardSkeleton } from '@/components/NewsCardSkeleton';
 
 // Logic
 import { useTexts } from '@/hooks/useTexts';
-import { ROUTE_HASHES } from '@/lib/routes';
+import { routePath } from '@/lib/routes';
 
 // Types
 import type { NewsList } from '@/hooks/useNews';
@@ -33,7 +33,7 @@ export function NewsSection({ news, placeholderCount }: Props) {
           </h2>
           <p className="text-muted-foreground sm:text-lg">{texts['news.subtitle']}</p>
         </div>
-        <a href={ROUTE_HASHES.news} className="inline-flex shrink-0 items-center gap-1.5 pt-2 font-semibold text-primary hover:underline">
+        <a href={routePath({ page: 'news' })} className="inline-flex shrink-0 items-center gap-1.5 pt-2 font-semibold text-primary hover:underline">
           {texts['news.seeAll']}
           <ArrowUpRight className="size-4" aria-hidden="true" />
         </a>

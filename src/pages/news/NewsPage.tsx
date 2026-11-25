@@ -12,7 +12,7 @@ const PLACEHOLDER_CARDS = 3; // one row of the grid while loading
 // Logic
 import { useNews } from '@/hooks/useNews';
 import { useTexts } from '@/hooks/useTexts';
-import { ROUTE_HASHES } from '@/lib/routes';
+import { routePath } from '@/lib/routes';
 
 /** A grid of all published news, newest order as set in the control panel. */
 export function NewsPage() {
@@ -21,7 +21,7 @@ export function NewsPage() {
 
   return (
     <section className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-12 sm:px-6">
-      <a href={ROUTE_HASHES.home} className="inline-flex w-fit items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+      <a href={routePath({ page: 'home' })} className="inline-flex w-fit items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
         <ArrowLeft className="size-4" aria-hidden="true" />
         {texts['news.backHome']}
       </a>

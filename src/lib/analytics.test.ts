@@ -13,7 +13,7 @@ test('accepts GA4 measurement ids only', () => {
 test('does nothing (and touches no browser API) until enabled', () => {
   const analytics = createAnalytics();
   assert.equal(analytics.isEnabled, false);
-  analytics.pageView('home');
+  analytics.pageView({ page: 'home' });
   analytics.track({ name: 'poll_results_open' });
   analytics.enable('not-an-id'); // invalid ids never load anything
   assert.equal(analytics.isEnabled, false);

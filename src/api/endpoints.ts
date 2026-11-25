@@ -9,11 +9,14 @@ import type { Session, SupabaseClient } from '@supabase/supabase-js';
 // Logic
 import { ApiError, NotConfiguredError, toApiError } from './errors';
 import {
+  faqItemSchema,
   newsItemSchema,
   siteSettingsSchema,
   statusStageSchema,
   textOverrideSchema,
   voteCountSchema,
+  type FaqItem,
+  type FaqItemDraft,
   type NewsItem,
   type NewsItemDraft,
   type SiteSettings,
@@ -27,7 +30,6 @@ import type { VoteCount } from '@/lib/voteResults';
 
 // Constants
 const MEDIA_BUCKET = 'media'; // public Storage bucket for uploaded images (migration 0004)
-const NEWS_COLUMNS = 'id, source, kind_label, title, summary, url, image_url, cta_label, is_published, position, created_at';
 
 /** Everything the site can ask of the back-end. */
 export type Api = ReturnType<typeof createApi>;
@@ -72,10 +74,18 @@ export function createApi(client: SupabaseClient | null) {
      * an admin receives drafts too, so public pages also filter on is_published.
      */
     async listNews(options: { publishedOnly: boolean; limit?: number }): Promise<NewsItem[]> {
-      let query = db().from('news_items').select(NEWS_COLUMNS).order('position').order('created_at', { ascending: false });
+      // Every column, so news stays readable before a migration that adds columns is applied.
+      let query = db().from('news_items').select('*').order('position').order('created_at', { ascending: false });
       if (options.publishedOnly) query = query.eq('is_published', true);
       if (options.limit) query = query.limit(options.limit);
       return parse(z.array(newsItemSchema), await run(query));
+    },
+
+    /** FAQ entries in display order; `publishedOnly` as for news. */
+    async listFaq(options: { publishedOnly: boolean }): Promise<FaqItem[]> {
+      let query = db().from('faq_items').select('id, question, answer, is_published, position').order('position');
+      if (options.publishedOnly) query = query.eq('is_published', true);
+      return parse(z.array(faqItemSchema), await run(query));
     },
 
     // ---- Votes -----------------------------------------------------------------------------
@@ -149,6 +159,17 @@ export function createApi(client: SupabaseClient | null) {
     async saveNewsItem(draft: NewsItemDraft, id?: string): Promise<void> {
       const table = db().from('news_items');
       await run(id ? table.update(draft).eq('id', id) : table.insert(draft));
+    },
+
+    /** Creates a FAQ entry (no id) or updates an existing one. */
+    async saveFaqItem(draft: FaqItemDraft, id?: string): Promise<void> {
+      const table = db().from('faq_items');
+      await run(id ? table.update(draft).eq('id', id) : table.insert(draft));
+    },
+
+    /** Deletes a FAQ entry. */
+    async deleteFaqItem(id: string): Promise<void> {
+      await run(db().from('faq_items').delete().eq('id', id));
     },
 
     /** Deletes a news item. */

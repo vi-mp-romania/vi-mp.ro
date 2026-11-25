@@ -3,57 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VI-MP.ro — Comunitatea română GTA VI multiplayer</title>
-    <meta
-      name="description"
-      content="Comunitatea română pentru viitorul multiplayer GTA VI: status, noutăți, servere și Discord. Pentru jucători, developeri și cei care vor să pornească un server."
-    />
+    <title>VI-MP.ro</title>
+    <!-- page-meta: the build writes each page's description, canonical URL, previews and structured data here (scripts/prerender.ts) -->
     <meta name="theme-color" content="#0d0b1a" />
     <link rel="icon" type="image/svg+xml" href="%BASE_URL%favicon.svg" />
-
-    <!-- Search engines. %SITE_URL% is replaced at build time (vite.config.ts, VITE_SITE_URL). -->
-    <link rel="canonical" href="%SITE_URL%/" />
-
-    <!-- Link previews (Discord, Facebook, WhatsApp, X) -->
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="VI-MP.ro" />
-    <meta property="og:locale" content="ro_RO" />
-    <meta property="og:url" content="%SITE_URL%/" />
-    <meta property="og:title" content="VI-MP.ro — Welcome to Vice City." />
-    <meta
-      property="og:description"
-      content="Construim de acum comunitatea română pentru viitorul multiplayer GTA VI. Intră pe Discord și spune-ne ce vrei să construim."
-    />
-    <meta property="og:image" content="%SITE_URL%/og-image.png" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="VI-MP.ro — Welcome to Vice City." />
-    <meta name="twitter:card" content="summary_large_image" />
-
-    <!-- Structured data: the site and the community behind it -->
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@graph": [
-          {
-            "@type": "WebSite",
-            "name": "VI-MP.ro",
-            "url": "%SITE_URL%/",
-            "inLanguage": "ro",
-            "description": "Comunitatea română pentru multiplayer GTA VI."
-          },
-          {
-            "@type": "Organization",
-            "name": "VI-MP.ro",
-            "url": "%SITE_URL%/",
-            "logo": "%SITE_URL%/og-image.png"
-          }
-        ]
-      }
-    </script>
   </head>
   <body>
-    <!-- At build time the prerendered home page is written inside #root (scripts/prerender.ts). -->
+    <!-- The build writes each prerendered page inside #root, and its bootstrap data after it. -->
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

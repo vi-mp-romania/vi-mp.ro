@@ -34,6 +34,9 @@ export function toApiError(failure: unknown): ApiError {
   if (code === '42501' || status === 401 || status === 403) {
     return new ApiError('Nu ai drepturi pentru această acțiune.', { cause: failure });
   }
+  if (code === '23505') {
+    return new ApiError('Există deja o înregistrare cu aceeași valoare (de ex. același link).', { cause: failure });
+  }
   if (code === '23514' || code === '22023' || code === '22P02') {
     return new ApiError('Datele trimise nu sunt valide.', { cause: failure });
   }

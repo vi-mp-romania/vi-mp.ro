@@ -18,7 +18,7 @@ because this project has no server of its own. The standard in one list:
 
 VI-MP.ro is the landing page of the Romanian GTA VI multiplayer community: a status timeline ("Unde
 suntem acum"), selected news, two interest polls (play / develop), a forum poll and a Discord call to
-action, plus a control panel (`#/admin`) where admins edit all of it. It is a static single-page app
+action, plus a control panel (`/admin/`) where admins edit all of it. It is a static single-page app
 (Vite + React + TypeScript + Tailwind) published on GitHub Pages. Supabase is the back-end: Postgres
 with row level security, a few SQL functions, and Supabase Auth for the admins.
 
@@ -59,19 +59,22 @@ present the totals as a secure count. Poll keys (`lib/polls.ts`) match the check
 **Failure behaviour.** Without Supabase configured, or when it cannot be reached, the page still renders:
 texts fall back to the registry defaults, status and news show a short notice, Discord buttons hide.
 
-**No layout shift.** Anything that arrives from the database holds its space before it arrives: the
-Discord buttons, the timeline and the news cards render same-sized placeholders (`components/ui/skeleton`,
-`NewsCardSkeleton`) while `isPending`. The last loaded settings, stages, texts and news are cached in
-localStorage (`api/siteDataCache.ts`, validated with the row schemas) so a returning visitor's first
-paint is the real content; fresh data then replaces it. New data-driven blocks follow the same rule.
-Check with a hard reload and the layout-shift measurement (CLS) rather than by eye.
+**No layout shift.** Prerendered pages carry their data (bootstrap), so they paint real content at
+once. Without it (development, a page newer than the last build) anything from the database holds its
+space before it arrives: the Discord buttons, the timeline and the news cards render same-sized
+placeholders (`components/ui/skeleton`, `NewsCardSkeleton`) while `isPending`. New data-driven blocks
+follow the same rule. Check with a hard reload and the layout-shift measurement (CLS) rather than by eye.
+
+**Images.** Uploaded from the panel (`ImageField`) into the public Supabase Storage bucket `media`
+(migration 0004, admin-only writes), resized in the browser first (`lib/resizeImage.ts`). Never link
+Discord attachments: their URLs expire.
 
 **Analytics.** Google Analytics 4 is optional and consent-gated. The measurement id is a setting
 (`site_settings.ga_measurement_id`, migration 0003, edited in Setări); empty means off and no banner.
 `lib/analytics.ts` is one resource created in `main.tsx` and provided through `useAnalytics()`; it
 loads nothing from Google until `enable`, which `useAnalyticsConsent` calls only after the visitor
 pressed Accept (stored in localStorage; the footer link asks again; refusing later deletes GA's
-cookies and reloads). Page views are sent by hand per route (`#/admin` never). Events are a closed
+cookies and reloads). Page views are sent by hand per route (`/admin/` and missing pages never). Events are a closed
 union (`AnalyticsEvent`): add a case there rather than calling gtag directly. Never send voter ids
 or anything typed by a visitor.
 
@@ -80,18 +83,23 @@ or anything typed by a visitor.
 (`#/…`) are left to the browser. The themed cursor and scrollbar live in `style.css`; the cursor applies
 only to fine pointers and text fields keep the text cursor.
 
-**Prerender and SEO.** `npm run build` also renders the home page once in Node
-(`src/prerender.tsx`, written into `dist/index.html` by `scripts/prerender.ts`) with the default texts
-and no data, so crawlers that do not run JavaScript read the content. In the browser `main.tsx`
-replaces it with `createRoot` (not hydration: the first client render differs, e.g. stored poll
-answers). Code that runs during render must therefore work without `window`; browser APIs belong in
-effects, or are guarded as in `useRoute`. Head tags (title, description, Open Graph, JSON-LD) live in
-`index.html`; `%SITE_URL%` and `robots.txt`/`sitemap.xml` come from `VITE_SITE_URL` in `vite.config.ts`.
-Head tags are build-time: texts edited in the panel do not change them.
+**URLs, prerender and SEO.** Pages have real paths with a trailing slash (`/`, `/noutati/`,
+`/noutati/<slug>/`, `/admin/`; `src/lib/routes.ts`); `useRoute` navigates in-app with the History API
+and rewrites old `#/…` links. `npm run build` loads the live data from Supabase
+(`src/prerender.tsx`, `api/bootstrap.ts`) and `scripts/prerender.ts` writes every page as
+`dist/<path>/index.html` (plus `404.html`, `sitemap.xml`, `robots.txt`), each with its own title,
+description, canonical URL, previews and JSON-LD from `lib/pageMeta.ts` (the one place for page
+metadata; `useDocumentMeta` applies the same values after in-app navigation). The same data is
+embedded as JSON (`#vimp-bootstrap`, validated on read) so the browser's first render matches the HTML;
+`main.tsx` then replaces it with `createRoot` (not hydration). A configured database that cannot be
+read fails the build, so a broken build never replaces the live site. The workflow also rebuilds daily.
+Code that runs during render must work without `window`: browser APIs belong in effects, or are
+guarded as in `useRoute`. Search wording lives in the text registry (`seo.*`, the hero H1, the FAQ),
+editable in the panel.
 
-Routes are hash routes in `src/lib/routes.ts` (`#/`, `#/noutati`, `#/admin`) so GitHub Pages needs no
-rewrite rules. In-page anchors (`#status`, `#noutati`, `#comunitate`) resolve to the home page.
-Renaming source folders never changes public URLs.
+In-page anchors (`#status`, `#noutati`, `#comunitate`, `#intrebari`) belong to the home page; from
+another page the header links to `/#status` and so on. Renaming source folders never changes public
+URLs (they are defined in `src/lib/routes.ts`).
 
 The admin session is persisted by supabase-js in localStorage; the visitor's own poll answers are
 remembered through `lib/browserStorage.ts`. The site works without storage.

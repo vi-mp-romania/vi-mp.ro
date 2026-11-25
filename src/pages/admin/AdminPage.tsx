@@ -5,6 +5,7 @@ import { useState, type ReactNode } from 'react';
 
 // Components
 import { LoginForm } from './LoginForm';
+import { FaqPanel } from './faq/FaqPanel';
 import { NewsPanel } from './news/NewsPanel';
 import { TextsPanel } from './texts/TextsPanel';
 import { VotesPanel } from './votes/VotesPanel';
@@ -24,6 +25,7 @@ import type { SiteData } from '@/hooks/useSiteData';
 const TABS = [
   { id: 'status', label: 'Status' },
   { id: 'news', label: 'Noutăți' },
+  { id: 'faq', label: 'Întrebări' },
   { id: 'texts', label: 'Texte' },
   { id: 'settings', label: 'Setări' },
   { id: 'votes', label: 'Voturi' },
@@ -103,6 +105,7 @@ export function AdminPage({ site }: Props) {
       <div role="tabpanel">
         {tab === 'status' && <StatusPanel site={site} />}
         {tab === 'news' && <NewsPanel />}
+        {tab === 'faq' && <FaqPanel />}
         {tab === 'texts' && <TextsPanel site={site} />}
         {tab === 'settings' && <SettingsPanel site={site} />}
         {tab === 'votes' && <VotesPanel />}

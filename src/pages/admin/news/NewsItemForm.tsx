@@ -13,6 +13,7 @@ import { ActionMessage } from '../components/ActionMessage';
 
 // Logic
 import { safeUrl } from '@/lib/safeUrl';
+import { isSlug, slugify } from '@/lib/slug';
 import { useApi } from '@/api/ApiContext';
 import { useAction } from '../hooks/useAction';
 import { NEWS_SOURCES, toNewsDraft, type NewsItem, type NewsItemDraft } from '@/api/types';
@@ -29,6 +30,8 @@ const EMPTY_DRAFT: NewsItemDraft = {
   cta_label: '',
   is_published: false,
   position: 0,
+  slug: '',
+  body: '',
 };
 
 /** Props of NewsItemForm. */
@@ -38,7 +41,11 @@ interface Props {
   onSaved: () => void;
 }
 
-/** Validates title and URLs before saving; the database checks the same rules. */
+/**
+ * Validates title, link and URLs before saving; the database checks the same rules. For a new item
+ * the page link (slug) follows the title until it is edited by hand; an existing item keeps its
+ * slug, because changing it changes the page's public URL.
+ */
 export function NewsItemForm({ item, nextPosition, onSaved }: Props) {
   const api = useApi();
   const action = useAction();
@@ -47,14 +54,26 @@ export function NewsItemForm({ item, nextPosition, onSaved }: Props) {
   const [draft, setDraft] = useState<NewsItemDraft>(() =>
     item ? toNewsDraft(item) : { ...EMPTY_DRAFT, position: nextPosition },
   );
+  const [isSlugEdited, setIsSlugEdited] = useState(item !== null); // stops following the title
 
   // Actions
   const set = <K extends keyof NewsItemDraft>(field: K, value: NewsItemDraft[K]) =>
     setDraft((current) => ({ ...current, [field]: value }));
+  const setTitle = (title: string) =>
+    setDraft((current) => ({ ...current, title, ...(isSlugEdited ? {} : { slug: slugify(title) }) }));
   const submit = async (event: FormEvent) => {
     event.preventDefault();
-    const cleaned = { ...draft, title: draft.title.trim(), url: draft.url.trim(), image_url: draft.image_url.trim() };
+    const title = draft.title.trim();
+    const cleaned = {
+      ...draft,
+      title,
+      url: draft.url.trim(),
+      image_url: draft.image_url.trim(),
+      slug: draft.slug.trim() || slugify(title),
+      body: draft.body.trim(),
+    };
     if (!cleaned.title) return action.fail('Titlul este obligatoriu.');
+    if (!isSlug(cleaned.slug)) return action.fail('Linkul paginii: doar litere mici, cifre și cratime (ex. gta-6-pe-pc).');
     if ([cleaned.url, cleaned.image_url].some((value) => value !== '' && !safeUrl(value))) {
       return action.fail('Linkurile trebuie să înceapă cu https://');
     }
@@ -78,10 +97,27 @@ export function NewsItemForm({ item, nextPosition, onSaved }: Props) {
         </Field>
       </div>
       <Field label="Titlu">
-        <Input value={draft.title} maxLength={160} required onChange={(e) => set('title', e.target.value)} />
+        <Input value={draft.title} maxLength={160} required onChange={(e) => setTitle(e.target.value)} />
+      </Field>
+      <Field
+        label="Link pagină (vi-mp.ro/noutati/…/)"
+        hint={item ? 'Schimbarea lui schimbă adresa paginii: linkurile vechi nu vor mai merge.' : 'Se completează din titlu.'}
+      >
+        <Input
+          value={draft.slug}
+          maxLength={80}
+          onChange={(e) => {
+            setIsSlugEdited(true);
+            set('slug', e.target.value.toLowerCase());
+          }}
+          placeholder="gta-6-pe-pc"
+        />
       </Field>
       <Field label="Rezumat">
         <Textarea value={draft.summary} maxLength={500} onChange={(e) => set('summary', e.target.value)} />
+      </Field>
+      <Field label="Text pagină (opțional)" hint="Apare pe pagina noutății. Lasă un rând gol între paragrafe. Mai mult text = mai bine pentru Google.">
+        <Textarea value={draft.body} rows={6} maxLength={10000} onChange={(e) => set('body', e.target.value)} />
       </Field>
       <Field label="Link">
         <Input type="url" value={draft.url} onChange={(e) => set('url', e.target.value)} placeholder="https://…" />

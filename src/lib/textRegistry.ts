@@ -5,7 +5,20 @@
  */
 
 /** A group of texts, shown together in the control panel. */
-export type TextSection = 'header' | 'hero' | 'status' | 'news' | 'polls' | 'forum' | 'discord' | 'footer' | 'consent';
+export type TextSection =
+  | 'seo'
+  | 'header'
+  | 'hero'
+  | 'status'
+  | 'news'
+  | 'article'
+  | 'polls'
+  | 'forum'
+  | 'faq'
+  | 'discord'
+  | 'footer'
+  | 'consent'
+  | 'notFound';
 
 /** One editable text. */
 export interface TextEntry {
@@ -20,33 +33,61 @@ export interface TextEntry {
 
 /** Control panel heading for each section, in display order. */
 export const TEXT_SECTIONS: Readonly<Record<TextSection, string>> = {
+  seo: 'Google (titlu și descriere în rezultatele căutării)',
   header: 'Antet',
   hero: 'Prima secțiune (hero)',
   status: 'Unde suntem acum',
   news: 'Noutăți',
+  article: 'Pagina unei noutăți',
   polls: 'Voturi',
   forum: 'Forum',
+  faq: 'Întrebări frecvente',
   discord: 'Discord',
   footer: 'Subsol',
   consent: 'Cookie-uri (Google Analytics)',
+  notFound: 'Pagină inexistentă (404)',
 };
 
 /** Every text on the site, by key. Keys are camelCase with dots; the DB checks the same shape. */
 export const TEXT_REGISTRY = {
+  'seo.homeTitle': {
+    section: 'seo',
+    label: 'Prima pagină: titlu (~60 caractere)',
+    value: 'GTA 6 Multiplayer România — servere, RP și comunitate | VI-MP.ro',
+  },
+  'seo.homeDescription': {
+    section: 'seo',
+    label: 'Prima pagină: descriere (~155 caractere)',
+    value:
+      'Comunitatea din România pentru GTA 6 multiplayer: când apare pe PC, servere românești, roleplay (RP), noutăți și Discord.',
+    isLong: true,
+  },
+  'seo.newsTitle': { section: 'seo', label: 'Noutăți: titlu', value: 'Noutăți GTA 6: PC, multiplayer și trailere | VI-MP.ro' },
+  'seo.newsDescription': {
+    section: 'seo',
+    label: 'Noutăți: descriere',
+    value: 'Ultimele știri despre GTA 6 pe PC, multiplayer și servere, plus trailere și discuții, selectate de comunitatea VI-MP.ro.',
+    isLong: true,
+  },
+
   'header.navStatus': { section: 'header', label: 'Meniu: Status', value: 'Status' },
   'header.navNews': { section: 'header', label: 'Meniu: Noutăți', value: 'Noutăți' },
   'header.navCommunity': { section: 'header', label: 'Meniu: Comunitate', value: 'Comunitate' },
   'header.discordButton': { section: 'header', label: 'Buton Discord', value: 'Intră pe Discord' },
 
-  'hero.eyebrow': { section: 'hero', label: 'Supratitlu', value: 'VI-MP.ro · Comunitatea română GTA VI' },
+  'hero.eyebrow': {
+    section: 'hero',
+    label: 'Titlul principal (H1, rândul mic portocaliu)',
+    value: 'GTA 6 Multiplayer România · VI-MP.ro',
+  },
   'hero.titleLine1': { section: 'hero', label: 'Titlu, rândul 1', value: 'Welcome to' },
   'hero.titleLine2': { section: 'hero', label: 'Titlu, rândul 2 (roz)', value: 'Vice City.' },
   'hero.description': {
     section: 'hero',
     label: 'Descriere',
     value:
-      'Construim de acum comunitatea pentru viitorul multiplayer GTA VI. Un loc pentru jucători, ' +
-      'developeri și cei care vor să pornească un server.',
+      'Construim de acum comunitatea din România pentru GTA 6 multiplayer: servere, roleplay și proiecte. ' +
+      'Un loc pentru jucători, developeri și cei care vor să pornească un server.',
     isLong: true,
   },
   'hero.discordButton': { section: 'hero', label: 'Buton Discord', value: 'Intră pe Discord' },
@@ -70,11 +111,24 @@ export const TEXT_REGISTRY = {
   'status.note': { section: 'status', label: 'Notă sub card (gol = ascunsă)', value: '' },
 
   'news.title': { section: 'news', label: 'Titlu', value: 'Noutăți de urmărit' },
-  'news.subtitle': { section: 'news', label: 'Subtitlu', value: 'Clipuri, discuții și linkuri selectate de noi.' },
+  'news.subtitle': {
+    section: 'news',
+    label: 'Subtitlu',
+    value: 'Trailere, știri despre GTA 6 pe PC și multiplayer, discuții din comunitate.',
+  },
   'news.seeAll': { section: 'news', label: 'Link „vezi toate”', value: 'Vezi toate' },
   'news.empty': { section: 'news', label: 'Mesaj când nu sunt noutăți', value: 'Încă nu am publicat noutăți.' },
   'news.pageTitle': { section: 'news', label: 'Pagina de noutăți: titlu', value: 'Toate noutățile' },
   'news.backHome': { section: 'news', label: 'Pagina de noutăți: înapoi', value: 'Înapoi acasă' },
+  'news.readMore': { section: 'news', label: 'Link spre pagina noutății', value: 'Citește' },
+
+  'article.backToNews': { section: 'article', label: 'Link înapoi', value: 'Toate noutățile' },
+  'article.more': { section: 'article', label: 'Titlu „alte noutăți”', value: 'Alte noutăți' },
+  'article.notFound': {
+    section: 'article',
+    label: 'Mesaj când noutatea nu există',
+    value: 'Noutatea aceasta nu mai există sau a fost mutată.',
+  },
 
   'polls.eyebrow': { section: 'polls', label: 'Supratitlu', value: 'Joacă sau construiește' },
   'polls.title': { section: 'polls', label: 'Titlu', value: 'Te bagi când apare multiplayerul?' },
@@ -128,6 +182,13 @@ export const TEXT_REGISTRY = {
   'forum.previewProjects': { section: 'forum', label: 'Previzualizare: rând 2', value: 'Proiecte' },
   'forum.previewServers': { section: 'forum', label: 'Previzualizare: rând 3', value: 'Servere' },
 
+  'faq.title': { section: 'faq', label: 'Titlu', value: 'Întrebări frecvente despre GTA 6 multiplayer' },
+  'faq.subtitle': {
+    section: 'faq',
+    label: 'Subtitlu',
+    value: 'Ce se știe acum despre GTA 6 pe PC, online, servere și roleplay în România.',
+  },
+
   'discord.title': { section: 'discord', label: 'Titlu', value: 'Ne găsești pe Discord.' },
   'discord.subtitle': {
     section: 'discord',
@@ -152,6 +213,13 @@ export const TEXT_REGISTRY = {
   },
   'consent.accept': { section: 'consent', label: 'Buton acceptă', value: 'Accept' },
   'consent.refuse': { section: 'consent', label: 'Buton refuză', value: 'Decline' },
+  'notFound.title': { section: 'notFound', label: 'Titlu', value: 'Pagina nu există' },
+  'notFound.message': {
+    section: 'notFound',
+    label: 'Mesaj',
+    value: 'Linkul e greșit sau pagina a fost mutată. Încearcă prima pagină sau noutățile.',
+  },
+  'notFound.home': { section: 'notFound', label: 'Buton prima pagină', value: 'Prima pagină' },
   'consent.footerLink': { section: 'consent', label: 'Link în subsol', value: 'Cookie Preferences' },
 } as const satisfies Record<string, TextEntry>;
 

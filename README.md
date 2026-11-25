@@ -3,8 +3,9 @@
 Site-ul comunității române pentru multiplayer GTA VI. Pagină statică (Vite + React) publicată pe
 GitHub Pages; conținutul, voturile și panoul de control folosesc Supabase.
 
-- Pagina publică: `#/` (status, noutăți, voturi, forum, Discord) și `#/noutati` (toate noutățile).
-- Panoul de control: `#/admin` (status, noutăți, texte, link Discord, imagine hero, voturi).
+- Pagina publică: `/` (status, noutăți, voturi, forum, întrebări, Discord), `/noutati/` (toate
+  noutățile) și `/noutati/<link>/` (o pagină pentru fiecare noutate).
+- Panoul de control: `/admin/` (status, noutăți, întrebări, texte, setări, voturi).
 
 ## Configurare Supabase (o singură dată)
 
@@ -66,14 +67,28 @@ Vizitatorii văd un banner „Accept / Refuz”; Google Analytics se încarcă d
 `/noutati`, niciodată panoul) și evenimentele `discord_click`, `poll_vote`, `poll_results_open`,
 `news_video_play`, `news_link_click`. ID gol = fără analytics și fără banner.
 
+## Pagini, SEO și Google
+
+- Adrese reale: `/`, `/noutati/`, `/noutati/<link>/` (o pagină pentru fiecare noutate), `/admin/`.
+  Linkurile vechi `#/noutati` redirecționează automat.
+- La fiecare build (push, manual sau zilnic la 03:17 UTC) se generează din baza de date toate paginile,
+  cu titlu, descriere și date structurate proprii, plus `sitemap.xml` și `robots.txt`.
+- Ce scrie Google în rezultate se schimbă din panou: **Texte → Google**. Secțiunea „Întrebări
+  frecvente” se editează din tabul **Întrebări**.
+- Pași în afara codului (cei mai importanți pentru poziția în Google): verifică domeniul în
+  [Google Search Console](https://search.google.com/search-console) și trimite
+  `https://vi-mp.ro/sitemap.xml`; la fel în Bing Webmaster Tools; obține linkuri spre vi-mp.ro
+  (descrierea serverului de Discord, listări Discord, Reddit, YouTube/TikTok, forumuri de gaming).
+
 ## Ce se schimbă din panou
 
 | Tab | Ce editează |
 | --- | --- |
 | Status | etapele din „Unde suntem acum” și până unde sunt gata |
-| Noutăți | adaugă, editează, publică/ascunde, șterge, ordonează |
+| Noutăți | adaugă, editează (link pagină, text pagină, imagine cu upload), publică/ascunde, ordonează |
+| Întrebări | întrebările frecvente de pe prima pagină (și pentru Google) |
 | Texte | orice text de pe site; „Text implicit” revine la varianta din cod |
-| Setări | linkul de invitație Discord (gol = butoane ascunse) și imaginea hero |
+| Setări | linkul de invitație Discord (gol = butoane ascunse), imaginea hero (cu upload), Google Analytics |
 | Voturi | rezultatele și resetarea pe întrebare |
 
 Voturile sunt anonime și unice per browser (un id păstrat în localStorage): cine își șterge datele

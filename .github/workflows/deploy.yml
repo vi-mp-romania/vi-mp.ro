@@ -1,10 +1,14 @@
-# Checks and builds the site, then publishes dist/ to GitHub Pages on every push to main.
+# Checks and builds the site, then publishes dist/ to GitHub Pages: on every push to main, by hand,
+# and once a day, so the prerendered pages, sitemap and structured data pick up what admins changed
+# in the control panel (the live site itself always loads fresh data in the browser).
 name: Deploy to GitHub Pages
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
+  schedule:
+    - cron: '17 3 * * *' # daily, 03:17 UTC (off the hour, when GitHub's scheduler is busiest)
 
 permissions:
   contents: read

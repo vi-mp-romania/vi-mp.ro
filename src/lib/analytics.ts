@@ -4,14 +4,12 @@
  * measurement id is configured, every call is a no-op. Page views are sent by hand because the
  * site uses hash routes, which GA would not see as separate pages.
  */
-import type { Route } from './routes';
+import { routePath, type Route } from './routes';
 
 // Constants
 const MEASUREMENT_ID = /^G-[A-Z0-9]{4,20}$/; // same rule as the check on site_settings.ga_measurement_id
 const TAG_URL = 'https://www.googletagmanager.com/gtag/js?id=';
 
-/** Path reported to GA for each public page. The control panel is never tracked. */
-const PAGE_PATHS: Readonly<Partial<Record<Route, string>>> = { home: '/', news: '/noutati' };
 
 /** An event GA records, with its parameters. */
 export type AnalyticsEvent =
@@ -67,8 +65,9 @@ export function createAnalytics(): Analytics {
       return gtag !== null;
     },
     pageView(route) {
-      const path = PAGE_PATHS[route];
-      if (!gtag || path === undefined) return;
+      // Public pages only: the control panel and missing pages are never reported.
+      if (!gtag || route.page === 'admin' || route.page === 'notFound') return;
+      const path = routePath(route);
       gtag('event', 'page_view', {
         page_path: path,
         page_location: `${window.location.origin}${path}`,
