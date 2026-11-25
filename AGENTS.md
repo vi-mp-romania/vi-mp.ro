@@ -59,6 +59,18 @@ present the totals as a secure count. Poll keys (`lib/polls.ts`) match the check
 **Failure behaviour.** Without Supabase configured, or when it cannot be reached, the page still renders:
 texts fall back to the registry defaults, status and news show a short notice, Discord buttons hide.
 
+**No layout shift.** Anything that arrives from the database holds its space before it arrives: the
+Discord buttons, the timeline and the news cards render same-sized placeholders (`components/ui/skeleton`,
+`NewsCardSkeleton`) while `isPending`. The last loaded settings, stages, texts and news are cached in
+localStorage (`api/siteDataCache.ts`, validated with the row schemas) so a returning visitor's first
+paint is the real content; fresh data then replaces it. New data-driven blocks follow the same rule.
+Check with a hard reload and the layout-shift measurement (CLS) rather than by eye.
+
+**Scrolling and pointer.** Lenis smooths page scrolling (`hooks/useSmoothScroll.ts`, one instance owned by
+`App`); it turns itself off for reduced motion and handles clicks on in-page section links. Hash routes
+(`#/…`) are left to the browser. The themed cursor and scrollbar live in `style.css`; the cursor applies
+only to fine pointers and text fields keep the text cursor.
+
 **Prerender and SEO.** `npm run build` also renders the home page once in Node
 (`src/prerender.tsx`, written into `dist/index.html` by `scripts/prerender.ts`) with the default texts
 and no data, so crawlers that do not run JavaScript read the content. In the browser `main.tsx`

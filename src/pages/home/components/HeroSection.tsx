@@ -15,10 +15,11 @@ import { useTexts } from '@/hooks/useTexts';
 interface Props {
   discordUrl: string | undefined;
   heroImageUrl: string | undefined; // configured picture; the built-in skyline shows without one
+  isPending: boolean; // settings still loading: keep the Discord button's space
 }
 
 /** The hero: text on the left, picture fading in from the right (behind the text on phones). */
-export function HeroSection({ discordUrl, heroImageUrl }: Props) {
+export function HeroSection({ discordUrl, heroImageUrl, isPending }: Props) {
   const texts = useTexts();
   const imageSrc = safeUrl(heroImageUrl);
 
@@ -37,7 +38,7 @@ export function HeroSection({ discordUrl, heroImageUrl }: Props) {
         </h1>
         <p className="max-w-md text-base text-foreground/85 sm:text-lg">{texts['hero.description']}</p>
         <div className="flex flex-wrap items-center gap-6 pt-2">
-          <DiscordButton url={discordUrl} label={texts['hero.discordButton']} size="lg" />
+          <DiscordButton url={discordUrl} label={texts['hero.discordButton']} size="lg" isPending={isPending} />
           <a href="#noutati" className="inline-flex items-center gap-1.5 font-semibold hover:text-primary">
             {texts['hero.newsLink']}
             <ArrowDown className="size-4" aria-hidden="true" />

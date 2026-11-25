@@ -37,27 +37,27 @@ export function HomePage({ site }: Props) {
   // Lifecycle: honour an anchor in the opening URL (#comunitate). The browser tries before React
   // has drawn the sections, so jump once the news (the section that changes height) has loaded.
   useEffect(() => {
-    if (news.isLoading || hasScrolledToAnchor.current) return;
+    if (news.isPending || hasScrolledToAnchor.current) return;
     hasScrolledToAnchor.current = true;
     const anchor = window.location.hash.slice(1);
     if (anchor && !anchor.startsWith('/')) document.getElementById(anchor)?.scrollIntoView();
-  }, [news.isLoading]);
+  }, [news.isPending]);
 
   const discordUrl = site.settings?.discord_url;
 
   return (
     <>
-      <HeroSection discordUrl={discordUrl} heroImageUrl={site.settings?.hero_image_url} />
+      <HeroSection discordUrl={discordUrl} heroImageUrl={site.settings?.hero_image_url} isPending={site.isPending} />
       <StatusSection
         stages={site.stages}
         currentStage={site.settings?.current_stage ?? 0}
-        isLoading={site.isLoading}
+        isPending={site.isPending}
         error={site.error}
       />
-      <NewsSection news={news} />
+      <NewsSection news={news} placeholderCount={HOME_NEWS_LIMIT} />
       <PollSection votes={votes} onShowResults={() => setIsResultsOpen(true)} />
       <ForumSection votes={votes} />
-      <DiscordSection discordUrl={discordUrl} />
+      <DiscordSection discordUrl={discordUrl} isPending={site.isPending} />
       <VoteResultsDialog isOpen={isResultsOpen} onClose={() => setIsResultsOpen(false)} />
     </>
   );

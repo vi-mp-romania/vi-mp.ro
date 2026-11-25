@@ -4,6 +4,10 @@ import { ArrowLeft } from 'lucide-react';
 
 // Components
 import { NewsCard } from '@/components/NewsCard';
+import { NewsCardSkeleton } from '@/components/NewsCardSkeleton';
+
+// Constants
+const PLACEHOLDER_CARDS = 3; // one row of the grid while loading
 
 // Logic
 import { useNews } from '@/hooks/useNews';
@@ -22,12 +26,12 @@ export function NewsPage() {
         {texts['news.backHome']}
       </a>
       <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl">{texts['news.pageTitle']}</h1>
-      {news.isLoading && <p className="text-sm text-muted-foreground">Se încarcă…</p>}
       {news.error && <p className="text-sm text-muted-foreground">{news.error}</p>}
-      {!news.error && !news.isLoading && news.items.length === 0 && (
+      {!news.error && !news.isPending && news.items.length === 0 && (
         <p className="text-sm text-muted-foreground">{texts['news.empty']}</p>
       )}
       <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
+        {news.isPending && Array.from({ length: PLACEHOLDER_CARDS }, (_, index) => <NewsCardSkeleton key={index} />)}
         {news.items.map((item) => (
           <NewsCard key={item.id} item={item} />
         ))}

@@ -22,8 +22,42 @@
 
 @layer base {
   html {
-    scroll-behavior: smooth;
-    color-scheme: dark;
+    color-scheme: dark; /* smooth scrolling is done by Lenis (hooks/useSmoothScroll.ts), not CSS */
+    /* Themed scrollbar: the standard properties (Chrome, Edge, Firefox) */
+    scrollbar-color: var(--color-primary) var(--color-background);
+    scrollbar-width: thin;
+  }
+
+  /* Themed scrollbar for Safari, which only knows the -webkit- pseudo-elements */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-background);
+  }
+  ::-webkit-scrollbar-thumb {
+    border: 2px solid var(--color-background);
+    border-radius: 9999px;
+    background: linear-gradient(var(--color-accent), var(--color-primary));
+  }
+
+  /* Themed cursor, only for mice and trackpads; touch screens and text fields keep the system ones */
+  @media (pointer: fine) {
+    html {
+      cursor: url('./assets/cursor.svg') 3 2, auto;
+    }
+    a[href],
+    button:not(:disabled),
+    select,
+    summary,
+    label:has(> input[type='checkbox']),
+    [role='tab'] {
+      cursor: url('./assets/cursor-pointer.svg') 3 2, pointer;
+    }
+    input:not([type='checkbox']),
+    textarea {
+      cursor: text;
+    }
   }
   body {
     @apply bg-background text-foreground font-sans antialiased;
@@ -32,6 +66,6 @@
     @apply outline-2 outline-offset-2 outline-primary;
   }
   section[id] {
-    scroll-margin-top: 5rem;
+    scroll-margin-top: 5rem; /* room for the sticky header after a jump (native and Lenis) */
   }
 }

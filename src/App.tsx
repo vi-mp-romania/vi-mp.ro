@@ -12,6 +12,7 @@ import { HomePage } from './pages/home/HomePage';
 import { useRoute } from './hooks/useRoute';
 import { TextsContext } from './hooks/useTexts';
 import { useSiteData } from './hooks/useSiteData';
+import { useSmoothScroll } from './hooks/useSmoothScroll';
 
 // Constants
 /** The control panel is loaded only when someone opens #/admin. */
@@ -21,6 +22,7 @@ const AdminPage = lazy(() => import('./pages/admin/AdminPage').then((module) => 
 export function App() {
   const route = useRoute();
   const site = useSiteData();
+  useSmoothScroll();
   const discordUrl = site.settings?.discord_url;
 
   // Lifecycle: a new page starts at the top (in-page anchors keep their own scrolling).
@@ -31,7 +33,7 @@ export function App() {
   return (
     <TextsContext.Provider value={site.texts}>
       <div className="flex min-h-dvh flex-col">
-        <Header route={route} discordUrl={discordUrl} />
+        <Header route={route} discordUrl={discordUrl} isPending={site.isPending} />
         <main className="flex-1">
           {route === 'home' && <HomePage site={site} />}
           {route === 'news' && <NewsPage />}

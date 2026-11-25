@@ -6,6 +6,7 @@ import { createRoot } from 'react-dom/client';
 // Styles (order matters: fonts before the stylesheet that uses them)
 import '@fontsource-variable/outfit';
 import '@fontsource/jetbrains-mono/500.css';
+import 'lenis/dist/lenis.css';
 import './style.css';
 
 // Logic

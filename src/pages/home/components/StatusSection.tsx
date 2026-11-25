@@ -3,6 +3,9 @@
 import { Fragment } from 'react';
 import { Check, Clock } from 'lucide-react';
 
+// Components
+import { Skeleton } from '@/components/ui/skeleton';
+
 // Logic
 import { cn } from '@/lib/cn';
 import { useTexts } from '@/hooks/useTexts';
@@ -12,12 +15,15 @@ import { buildStageViews, type StageView, type StatusStage } from '@/lib/statusP
 interface Props {
   stages: StatusStage[];
   currentStage: number;
-  isLoading: boolean;
+  isPending: boolean; // nothing loaded yet: draw a placeholder timeline of the same height
   error: string | null; // shown when the timeline could not be loaded
 }
 
+// Constants
+const PLACEHOLDER_STAGES = 3; // stages drawn while loading (the usual timeline length)
+
 /** The timeline (horizontal on wide screens, vertical on phones) above the status card. */
-export function StatusSection({ stages, currentStage, isLoading, error }: Props) {
+export function StatusSection({ stages, currentStage, isPending, error }: Props) {
   const texts = useTexts();
   const views = buildStageViews(stages, currentStage);
 
@@ -25,7 +31,8 @@ export function StatusSection({ stages, currentStage, isLoading, error }: Props)
     <section id="status" className="mx-auto flex max-w-6xl flex-col gap-10 px-4 py-12 sm:px-6">
       <h2 className="text-4xl font-extrabold tracking-tight sm:text-5xl">{texts['status.title']}</h2>
 
-      {views.length > 0 ? (
+      {isPending && <TimelineSkeleton />}
+      {!isPending && views.length > 0 && (
         <ol className="flex flex-col gap-2 md:flex-row md:items-center md:gap-0">
           {views.map((stage, index) => (
             <Fragment key={stage.position}>
@@ -39,9 +46,8 @@ export function StatusSection({ stages, currentStage, isLoading, error }: Props)
             </Fragment>
           ))}
         </ol>
-      ) : (
-        <p className="text-sm text-muted-foreground">{isLoading ? 'Se încarcă…' : error}</p>
       )}
+      {!isPending && views.length === 0 && <p className="text-sm text-muted-foreground">{error}</p>}
 
       <div className="flex gap-5 rounded-2xl border border-border border-l-4 border-l-accent bg-card p-6 sm:p-8">
         <Clock className="mt-1 size-9 shrink-0 text-accent" aria-hidden="true" />
@@ -59,6 +65,30 @@ export function StatusSection({ stages, currentStage, isLoading, error }: Props)
 }
 
 // Internals
+
+/** Placeholder timeline: same circles, line heights and connectors as the real one. */
+function TimelineSkeleton() {
+  return (
+    <ol aria-hidden="true" className="flex flex-col gap-2 md:flex-row md:items-center md:gap-0">
+      {Array.from({ length: PLACEHOLDER_STAGES }, (_, index) => (
+        <Fragment key={index}>
+          <li className="flex items-center gap-4">
+            <Skeleton className="size-12 shrink-0 rounded-full" />
+            <span className="flex flex-col">
+              <span className="flex h-6 items-center">
+                <Skeleton className="h-4 w-28" />
+              </span>
+              <span className="flex h-5 items-center">
+                <Skeleton className="h-3 w-20" />
+              </span>
+            </span>
+          </li>
+          {index < PLACEHOLDER_STAGES - 1 && <Connector isDone={false} hereLabel={null} />}
+        </Fragment>
+      ))}
+    </ol>
+  );
+}
 
 /** One stage: icon plus "01 / Title" and its caption. State is shown by icon and text, not color. */
 function StageItem({ stage }: { stage: StageView }) {

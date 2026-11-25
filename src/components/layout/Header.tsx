@@ -19,13 +19,14 @@ const SECTION_IDS = ['status', 'noutati', 'comunitate'] as const;
 interface Props {
   route: Route; // the current page, to highlight its link
   discordUrl: string | undefined;
+  isPending: boolean; // settings still loading: keep the Discord button's space
 }
 
 /**
  * The sticky site header. On the home page the link of the section in view is highlighted as you
  * scroll; on the news page "Noutăți" is. From another page the section links lead back home.
  */
-export function Header({ route, discordUrl }: Props) {
+export function Header({ route, discordUrl, isPending }: Props) {
   const texts = useTexts();
   const activeSection = useActiveSection(SECTION_IDS, route === 'home');
   const links = [
@@ -63,7 +64,7 @@ export function Header({ route, discordUrl }: Props) {
           ))}
         </nav>
 
-        <DiscordButton url={discordUrl} label={texts['header.discordButton']} size="sm" />
+        <DiscordButton url={discordUrl} label={texts['header.discordButton']} size="sm" isPending={isPending} />
       </div>
     </header>
   );

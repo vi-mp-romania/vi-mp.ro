@@ -4,6 +4,7 @@ import { ArrowUpRight, Images } from 'lucide-react';
 
 // Components
 import { NewsCard } from '@/components/NewsCard';
+import { NewsCardSkeleton } from '@/components/NewsCardSkeleton';
 
 // Logic
 import { useTexts } from '@/hooks/useTexts';
@@ -15,10 +16,11 @@ import type { NewsList } from '@/hooks/useNews';
 /** Props of NewsSection. */
 interface Props {
   news: NewsList;
+  placeholderCount: number; // cards drawn while loading (the number the page asked for)
 }
 
 /** Section header with the "see all" link, then a two-column grid of cards. */
-export function NewsSection({ news }: Props) {
+export function NewsSection({ news, placeholderCount }: Props) {
   const texts = useTexts();
 
   return (
@@ -38,10 +40,11 @@ export function NewsSection({ news }: Props) {
       </div>
 
       {news.error && <p className="text-sm text-muted-foreground">{news.error}</p>}
-      {!news.error && !news.isLoading && news.items.length === 0 && (
+      {!news.error && !news.isPending && news.items.length === 0 && (
         <p className="text-sm text-muted-foreground">{texts['news.empty']}</p>
       )}
       <div className="grid gap-8 md:grid-cols-2">
+        {news.isPending && Array.from({ length: placeholderCount }, (_, index) => <NewsCardSkeleton key={index} />)}
         {news.items.map((item) => (
           <NewsCard key={item.id} item={item} />
         ))}
