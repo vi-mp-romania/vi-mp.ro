@@ -7,6 +7,7 @@ import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { PanelCard } from '../components/PanelCard';
+import { ImageField } from '../components/ImageField';
 import { ActionMessage } from '../components/ActionMessage';
 
 // Logic
@@ -66,9 +67,14 @@ export function SettingsPanel({ site }: Props) {
       <Field label="Link invitație Discord" hint="Ex. https://discord.gg/codul-vostru. Gol = butoanele Discord sunt ascunse.">
         <Input type="url" value={discordUrl} onChange={(e) => setDiscordUrl(e.target.value)} placeholder="https://discord.gg/…" />
       </Field>
-      <Field label="Imagine hero (URL)" hint="Gol = ilustrația implicită cu orașul la apus.">
-        <Input type="url" value={heroImageUrl} onChange={(e) => setHeroImageUrl(e.target.value)} placeholder="https://…" />
-      </Field>
+      <ImageField
+        label="Imagine hero"
+        hint="Gol = ilustrația implicită cu orașul la apus. Nu folosi linkuri de pe Discord: expiră."
+        value={heroImageUrl}
+        onChange={setHeroImageUrl}
+        folder="hero"
+        maxWidth={1920}
+      />
       <Field
         label="Google Analytics (Measurement ID)"
         hint="Din GA: Admin → Data streams → stream-ul site-ului. Gol = fără analytics și fără banner de cookie-uri."

@@ -26,7 +26,12 @@ export function HeroSection({ discordUrl, heroImageUrl, isPending }: Props) {
   return (
     <section className="relative overflow-hidden">
       <div className="absolute inset-y-0 right-0 w-full opacity-40 [mask-image:linear-gradient(to_right,transparent,black_45%)] md:w-3/5 md:opacity-100">
-        {imageSrc ? <img src={imageSrc} alt="" className="h-full w-full object-cover" /> : <SkylineIllustration />}
+        {imageSrc ? (
+          // The largest thing above the fold: fetch it first.
+          <img src={imageSrc} alt="" fetchPriority="high" className="h-full w-full object-cover" />
+        ) : (
+          <SkylineIllustration />
+        )}
       </div>
 
       <div className="relative mx-auto flex max-w-6xl flex-col gap-5 px-4 py-16 sm:px-6 md:py-24">

@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { ImageField } from '../components/ImageField';
 import { ActionMessage } from '../components/ActionMessage';
 
 // Logic
@@ -85,9 +86,14 @@ export function NewsItemForm({ item, nextPosition, onSaved }: Props) {
       <Field label="Link">
         <Input type="url" value={draft.url} onChange={(e) => set('url', e.target.value)} placeholder="https://…" />
       </Field>
-      <Field label="Imagine (URL)" hint="Gol = ilustrația implicită.">
-        <Input type="url" value={draft.image_url} onChange={(e) => set('image_url', e.target.value)} placeholder="https://…" />
-      </Field>
+      <ImageField
+        label="Imagine"
+        hint="Gol = ilustrația implicită. Pentru YouTube poți lăsa thumbnail-ul clipului."
+        value={draft.image_url}
+        onChange={(url) => set('image_url', url)}
+        folder="news"
+        maxWidth={1280}
+      />
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Text link (ex. Vezi clipul)">
           <Input value={draft.cta_label} maxLength={40} onChange={(e) => set('cta_label', e.target.value)} />

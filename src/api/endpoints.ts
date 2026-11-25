@@ -26,6 +26,7 @@ import type { TextOverride } from '@/lib/texts';
 import type { VoteCount } from '@/lib/voteResults';
 
 // Constants
+const MEDIA_BUCKET = 'media'; // public Storage bucket for uploaded images (migration 0004)
 const NEWS_COLUMNS = 'id, source, kind_label, title, summary, url, image_url, cta_label, is_published, position, created_at';
 
 /** Everything the site can ask of the back-end. */
@@ -153,6 +154,22 @@ export function createApi(client: SupabaseClient | null) {
     /** Deletes a news item. */
     async deleteNewsItem(id: string): Promise<void> {
       await run(db().from('news_items').delete().eq('id', id));
+    },
+
+    /**
+     * Uploads an image to the media bucket under a fresh random name (so files are never replaced
+     * and can be cached forever) and returns its public URL.
+     */
+    async uploadImage(image: { blob: Blob; extension: string }, folder: 'hero' | 'news'): Promise<string> {
+      const path = `${folder}/${crypto.randomUUID()}.${image.extension}`;
+      const storage = db().storage.from(MEDIA_BUCKET);
+      const { error } = await storage.upload(path, image.blob, {
+        contentType: image.blob.type,
+        cacheControl: '31536000',
+        upsert: false,
+      });
+      if (error) throw toApiError(error);
+      return storage.getPublicUrl(path).data.publicUrl;
     },
 
     /** Deletes every vote of one poll. */
