@@ -24,7 +24,7 @@ export function Footer({ discordUrl, onOpenConsent }: Props) {
     <footer className="mx-auto w-full max-w-6xl px-4 sm:px-6">
       <div className="flex flex-col items-center gap-3 border-t border-border py-6 text-sm sm:flex-row sm:justify-between">
         <a href={ROUTE_HASHES.home} className="font-bold">
-          {texts['footer.brand']}
+          © {new Date().getFullYear()} {texts['footer.brand']}
         </a>
         <p className="text-center text-xs text-muted-foreground">{texts['footer.disclaimer']}</p>
         <div className="flex items-center gap-4">

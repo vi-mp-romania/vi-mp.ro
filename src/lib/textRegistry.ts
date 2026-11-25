@@ -136,25 +136,23 @@ export const TEXT_REGISTRY = {
   },
   'discord.button': { section: 'discord', label: 'Buton', value: 'Hai în comunitate' },
 
-  'footer.brand': { section: 'footer', label: 'Nume', value: 'VI-MP.ro' },
+  'footer.brand': { section: 'footer', label: 'Nume (după „© anul curent”)', value: 'VI-MP.ro' },
   'footer.disclaimer': {
     section: 'footer',
     label: 'Mențiune',
-    value: 'Comunitate independentă, neafiliată Rockstar Games.',
+    value: 'Not affiliated with or endorsed by Rockstar Games.',
   },
   'footer.discordLink': { section: 'footer', label: 'Link Discord', value: 'Discord' },
 
   'consent.message': {
     section: 'consent',
     label: 'Mesaj banner',
-    value:
-      'Folosim Google Analytics, cu cookie-uri, ca să vedem câți vizitatori avem și ce îi interesează. ' +
-      'Se pornește doar dacă ești de acord.',
+    value: 'This website uses cookies to understand how many people visit it and how it is used.',
     isLong: true,
   },
   'consent.accept': { section: 'consent', label: 'Buton acceptă', value: 'Accept' },
-  'consent.refuse': { section: 'consent', label: 'Buton refuză', value: 'Refuz' },
-  'consent.footerLink': { section: 'consent', label: 'Link în subsol', value: 'Cookie-uri' },
+  'consent.refuse': { section: 'consent', label: 'Buton refuză', value: 'Decline' },
+  'consent.footerLink': { section: 'consent', label: 'Link în subsol', value: 'Cookies' },
 } as const satisfies Record<string, TextEntry>;
 
 /** Key of an editable text. */

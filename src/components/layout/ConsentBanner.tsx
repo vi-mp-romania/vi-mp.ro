@@ -19,7 +19,7 @@ export function ConsentBanner({ onAccept, onRefuse }: Props) {
   const texts = useTexts();
   return (
     <section
-      aria-label="Cookie-uri"
+      aria-label="Cookies"
       className="fixed inset-x-3 bottom-3 z-40 mx-auto flex max-w-3xl flex-col gap-4 rounded-2xl border border-primary/40 bg-card/95 p-4 shadow-[0_0_40px_-12px] shadow-primary/50 backdrop-blur sm:flex-row sm:items-center sm:p-5"
     >
       <p className="flex-1 text-sm text-foreground/90">{texts['consent.message']}</p>
