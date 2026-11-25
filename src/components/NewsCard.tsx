@@ -1,6 +1,7 @@
 /** One news item as a card: thumbnail, source line, title, summary and link. */
 // Libs
-import { ArrowUpRight, CirclePlay, Link as LinkIcon, MessagesSquare } from 'lucide-react';
+import { useState, type ReactNode } from 'react';
+import { ArrowUpRight, CirclePlay, Link as LinkIcon, MessagesSquare, Play } from 'lucide-react';
 
 // Components
 import { DiscordIcon } from './DiscordIcon';
@@ -8,6 +9,7 @@ import { SkylineIllustration } from './SkylineIllustration';
 
 // Logic
 import { safeUrl } from '@/lib/safeUrl';
+import { youtubeEmbedUrl, youtubeVideoId } from '@/lib/youtube';
 
 // Types
 import type { NewsItem, NewsSource } from '@/api/types';
@@ -25,27 +27,66 @@ interface Props {
   item: NewsItem;
 }
 
-/** A news card; the thumbnail falls back to the skyline and the link hides without a valid URL. */
+/**
+ * A news card. A YouTube link plays in place: the thumbnail is a play button that swaps itself for
+ * the player (same 16:9 box, so nothing moves), loaded only on that click. Any other link makes the
+ * picture a second link to the same place, kept out of the tab order and from screen readers because
+ * the text link already announces it. Without an image the skyline shows; without a valid URL the
+ * links hide.
+ */
 export function NewsCard({ item }: Props) {
   const href = safeUrl(item.url);
   const imageSrc = safeUrl(item.image_url);
+  const videoId = youtubeVideoId(href);
+
+  // State
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const picture = (
+    <>
+      {imageSrc ? (
+        <img
+          src={imageSrc}
+          alt=""
+          loading="lazy"
+          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+        />
+      ) : (
+        <SkylineIllustration hasSun={false} />
+      )}
+      {videoId && <PlayBadge />}
+    </>
+  );
 
   return (
     <article className="flex flex-col gap-3">
-      <div className="relative aspect-video overflow-hidden rounded-2xl border border-border bg-card">
-        {imageSrc ? (
-          <img src={imageSrc} alt="" loading="lazy" className="h-full w-full object-cover" />
-        ) : (
-          <SkylineIllustration hasSun={false} />
-        )}
-        {item.source === 'youtube' && (
-          <span className="absolute inset-0 grid place-items-center" aria-hidden="true">
-            <span className="grid size-14 place-items-center rounded-full bg-black/60 text-white">
-              <CirclePlay className="size-8" />
-            </span>
-          </span>
-        )}
-      </div>
+      {videoId && isPlaying && (
+        <MediaFrame>
+          <iframe
+            src={youtubeEmbedUrl(videoId)}
+            title={item.title}
+            allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+            allowFullScreen
+            referrerPolicy="strict-origin-when-cross-origin"
+            className="h-full w-full"
+          />
+        </MediaFrame>
+      )}
+      {videoId && !isPlaying && (
+        <MediaFrame>
+          <button type="button" onClick={() => setIsPlaying(true)} aria-label={`Redă video: ${item.title}`} className="group block h-full w-full">
+            {picture}
+          </button>
+        </MediaFrame>
+      )}
+      {!videoId && href && (
+        <MediaFrame>
+          <a href={href} target="_blank" rel="noopener noreferrer" tabIndex={-1} aria-hidden="true" className="group block h-full w-full">
+            {picture}
+          </a>
+        </MediaFrame>
+      )}
+      {!videoId && !href && <MediaFrame>{picture}</MediaFrame>}
 
       <p className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-muted-foreground">
         <SourceIcon source={item.source} />
@@ -70,6 +111,22 @@ export function NewsCard({ item }: Props) {
 }
 
 // Internals
+
+/** The 16:9 rounded box every thumbnail state (picture, link, player) is drawn in. */
+function MediaFrame({ children }: { children: ReactNode }) {
+  return <div className="relative aspect-video overflow-hidden rounded-2xl border border-border bg-card">{children}</div>;
+}
+
+/** Round play button drawn over a video thumbnail; decorative, the surrounding button is labelled. */
+function PlayBadge() {
+  return (
+    <span className="absolute inset-0 grid place-items-center" aria-hidden="true">
+      <span className="grid size-16 place-items-center rounded-full bg-black/60 text-white transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+        <Play className="ml-1 size-7 fill-current" />
+      </span>
+    </span>
+  );
+}
 
 /** Small icon for the news source. */
 function SourceIcon({ source }: { source: NewsSource }) {

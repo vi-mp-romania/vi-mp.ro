@@ -1,8 +1,22 @@
 /* The single stylesheet entry: Tailwind and the theme tokens. */
 @import 'tailwindcss';
 
+/*
+ * Arial (Liberation Sans on Linux) adjusted to Outfit's metrics, shown until Outfit has loaded, so
+ * the swap moves nothing. Values computed from Outfit (weight 400) against Liberation Sans with
+ * fontTools: average width 99.7%, ascent 1.00 em, descent 0.26 em, no line gap.
+ */
+@font-face {
+  font-family: 'Outfit Fallback';
+  src: local('Arial'), local('Liberation Sans'), local('Helvetica');
+  size-adjust: 99.7%;
+  ascent-override: 100.3%;
+  descent-override: 26.08%;
+  line-gap-override: 0%;
+}
+
 @theme {
-  --font-sans: 'Outfit Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Outfit Variable', 'Outfit Fallback', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 
   --color-background: #0d0b1a;
